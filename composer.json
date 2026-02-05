@@ -6,7 +6,8 @@
     "require": {
         "php": "^8.2",
         "illuminate/support": "^11.0|^12.0",
-        "livewire/livewire": "^3.0"
+        "livewire/livewire": "^3.0",
+        "morilog/jalali": "^3.4"
     },
     "autoload": {
         "psr-4": {

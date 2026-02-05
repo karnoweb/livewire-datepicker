@@ -1,29 +1,18 @@
 /**
- * Pure JavaScript Jalali Calendar Converter
+ * Jalali calendar wrapper around jalaali-js (Borkowski algorithm, well-tested).
+ * Keeps the same API for datepicker.js; delegates conversion to jalaali-js.
  */
+
+import jalaali from 'jalaali-js';
+
+const gDaysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
 const Jalali = {
     jDaysInMonth: [31, 31, 31, 31, 31, 31, 30, 30, 30, 30, 30, 29],
-    gDaysInMonth: [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31],
+    gDaysInMonth,
 
     isJalaliLeap(jy) {
-        const breaks = [-61, 9, 38, 199, 426, 686, 756, 818, 1111, 1181, 1210, 1635, 2060, 2097, 2192, 2262, 2324, 2394, 2456, 3178];
-        let bl = breaks.length;
-        let jp = breaks[0];
-        let jm, jump, leap, n, i;
-        for (i = 1; i < bl; i += 1) {
-            jm = breaks[i];
-            jump = jm - jp;
-            if (jy < jm) {
-                n = jy - jp;
-                if (jump - n < 6) n = n - jump + ((jump + 4) / 33 | 0) * 33;
-                leap = ((((n + 1) % 33) - 1) % 4) === 0;
-                if (leap && (n - 1) % 33 === 3) leap = false;
-                break;
-            }
-            jp = jm;
-        }
-        return leap;
+        return jalaali.isLeapJalaaliYear(jy);
     },
 
     isGregorianLeap(gy) {
@@ -31,64 +20,22 @@ const Jalali = {
     },
 
     jalaliMonthDays(jy, jm) {
-        if (jm === 12 && this.isJalaliLeap(jy)) return 30;
-        return this.jDaysInMonth[jm - 1];
+        return jalaali.jalaaliMonthLength(jy, jm);
     },
 
     gregorianMonthDays(gy, gm) {
         if (gm === 2 && this.isGregorianLeap(gy)) return 29;
-        return this.gDaysInMonth[gm - 1];
+        return gDaysInMonth[gm - 1];
     },
 
     toGregorian(jy, jm, jd) {
-        const breaks = [-61, 9, 38, 199, 426, 686, 756, 818, 1111, 1181, 1210, 1635, 2060, 2097, 2192, 2262, 2324, 2394, 2456, 3178];
-        let bl = breaks.length;
-        let gy = jy + 621;
-        let jp = breaks[0];
-        let jm2, jump, leap, leapG, march, n, i;
-        for (i = 1; i < bl; i += 1) {
-            jm2 = breaks[i];
-            jump = jm2 - jp;
-            if (jy < jm2) break;
-            jp = jm2;
-        }
-        n = jy - jp;
-        jp = breaks[i - 1];
-        leapG = Math.floor(gy / 4) - Math.floor((Math.floor(gy / 100) + 1) * 3 / 4) - 150;
-        march = 20 + n - leapG;
-        if (jump - n < 6) n = n - jump + Math.floor((jump + 4) / 33) * 33;
-        leap = (((n + 1) % 33 - 1) % 4 === 0);
-        if (leap && (n - 1) % 33 === 3) leap = false;
-        if (leap && jy - jp > 0) march--;
-        let gd = jd + march;
-        for (let m = 0; m < jm - 1; m++) gd += this.jDaysInMonth[m];
-        let gm = 3;
-        while (gd > this.gregorianMonthDays(gy, gm)) {
-            gd -= this.gregorianMonthDays(gy, gm);
-            gm++;
-            if (gm > 12) { gm = 1; gy++; }
-        }
-        return { year: gy, month: gm, day: gd };
+        const r = jalaali.toGregorian(jy, jm, jd);
+        return { year: r.gy, month: r.gm, day: r.gd };
     },
 
     toJalali(gy, gm, gd) {
-        let gDayNo = gd;
-        for (let i = 0; i < gm - 1; i++) {
-            gDayNo += this.gDaysInMonth[i];
-            if (i === 1 && this.isGregorianLeap(gy)) gDayNo++;
-        }
-        let jDayNo = gDayNo + (gy - 622) * 365 + Math.floor((gy - 621) / 4) - Math.floor((gy - 621) / 100) + Math.floor((gy - 621) / 400) - 79;
-        let jy = 1;
-        while (jDayNo > (this.isJalaliLeap(jy) ? 366 : 365)) {
-            jDayNo -= this.isJalaliLeap(jy) ? 366 : 365;
-            jy++;
-        }
-        let jm = 1;
-        while (jDayNo > this.jalaliMonthDays(jy, jm)) {
-            jDayNo -= this.jalaliMonthDays(jy, jm);
-            jm++;
-        }
-        return { year: jy, month: jm, day: jDayNo };
+        const r = jalaali.toJalaali(gy, gm, gd);
+        return { year: r.jy, month: r.jm, day: r.jd };
     },
 
     parse(str, format = 'Y-m-d') {

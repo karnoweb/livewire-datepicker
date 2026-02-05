@@ -27,6 +27,11 @@ Datepicker component for **Livewire 3** with **Alpine.js**, supporting **Jalali 
 - Livewire ^3.0
 - Alpine.js (included with Livewire 3)
 
+## Calendar conversion (tested packages)
+
+- **PHP:** [morilog/jalali](https://github.com/morilog/jalali) (^3.4) — Jalali/Gregorian conversion; used by the package helpers `jalali_to_gregorian()` and `gregorian_to_jalali()`.
+- **JavaScript:** [jalaali-js](https://github.com/jalaali/jalaali-js) — Borkowski algorithm; the package’s Alpine datepicker uses it via a thin wrapper. Your app must have `jalaali-js` in `package.json` and import the package’s `jalali.js` + `datepicker.js` in its Vite entry so the wrapper and datepicker are bundled.
+
 ---
 
 ## Installation
@@ -83,16 +88,18 @@ packages/karnoweb/livewire-datepicker/resources/js/datepicker.js
 
 ## Usage
 
+The component is registered as **`<x-jalali-datepicker>`** to avoid collision with Mary-UI's `<x-datepicker>`.
+
 ### Basic (Jalali, single date)
 
 ```blade
-<x-datepicker wire:model="birth_date" />
+<x-jalali-datepicker wire:model="birth_date" />
 ```
 
 ### With label and placeholder
 
 ```blade
-<x-datepicker
+<x-jalali-datepicker
     wire:model="birth_date"
     label="تاریخ تولد"
     placeholder="انتخاب تاریخ"
@@ -102,7 +109,7 @@ packages/karnoweb/livewire-datepicker/resources/js/datepicker.js
 ### Gregorian calendar (display)
 
 ```blade
-<x-datepicker wire:model="event_date" :jalali="false" />
+<x-jalali-datepicker wire:model="event_date" :jalali="false" />
 ```
 
 ### Show Jalali, store Gregorian
@@ -110,7 +117,7 @@ packages/karnoweb/livewire-datepicker/resources/js/datepicker.js
 Useful when the database column is a standard date (`Y-m-d`):
 
 ```blade
-<x-datepicker
+<x-jalali-datepicker
     wire:model="birth_date"
     jalali
     export-calendar="gregorian"
@@ -121,7 +128,7 @@ Useful when the database column is a standard date (`Y-m-d`):
 ### Date range
 
 ```blade
-<x-datepicker wire:model="date_range" :range="true" />
+<x-jalali-datepicker wire:model="date_range" :range="true" />
 ```
 
 `wire:model` will receive an object like `{ "start": "1403/01/01", "end": "1403/01/15" }` (or Gregorian if `export-calendar="gregorian"`).
@@ -129,19 +136,19 @@ Useful when the database column is a standard date (`Y-m-d`):
 ### Multiple dates
 
 ```blade
-<x-datepicker wire:model="selected_dates" :multiple="true" />
+<x-jalali-datepicker wire:model="selected_dates" :multiple="true" />
 ```
 
 Optional: limit number of selections:
 
 ```blade
-<x-datepicker wire:model="selected_dates" :multiple="true" :max-selections="5" />
+<x-jalali-datepicker wire:model="selected_dates" :multiple="true" :max-selections="5" />
 ```
 
 ### Min / max date
 
 ```blade
-<x-datepicker
+<x-jalali-datepicker
     wire:model="event_date"
     min-date="1402/01/01"
     max-date="1403/12/29"
@@ -155,7 +162,7 @@ Use the same format as `input-format` (default `Y/m/d` for Jalali).
 Pass an array of date strings in the same format:
 
 ```blade
-<x-datepicker
+<x-jalali-datepicker
     wire:model="event_date"
     :disabled-dates="['1403/07/01', '1403/07/02']"
 />
@@ -167,7 +174,7 @@ Pass an array of date strings in the same format:
 - **export-format** — Format sent to Livewire (e.g. `Y-m-d`, `Y/m/d`).
 
 ```blade
-<x-datepicker
+<x-jalali-datepicker
     wire:model="event_date"
     input-format="Y/m/d"
     export-format="Y-m-d"
@@ -179,7 +186,7 @@ Pass an array of date strings in the same format:
 - `light` / `dark` / `auto` (default from config). Override:
 
 ```blade
-<x-datepicker wire:model="event_date" theme="dark" />
+<x-jalali-datepicker wire:model="event_date" theme="dark" />
 ```
 
 ### Position
@@ -187,7 +194,7 @@ Pass an array of date strings in the same format:
 Dropdown position (e.g. `bottom-start`, `top-end`):
 
 ```blade
-<x-datepicker wire:model="event_date" position="top-start" />
+<x-jalali-datepicker wire:model="event_date" position="top-start" />
 ```
 
 ### Inline
@@ -195,14 +202,14 @@ Dropdown position (e.g. `bottom-start`, `top-end`):
 Show calendar always open (no dropdown):
 
 ```blade
-<x-datepicker wire:model="event_date" :inline="true" />
+<x-jalali-datepicker wire:model="event_date" :inline="true" />
 ```
 
 ### Required / disabled
 
 ```blade
-<x-datepicker wire:model="event_date" :required="true" />
-<x-datepicker wire:model="event_date" :disabled="true" />
+<x-jalali-datepicker wire:model="event_date" :required="true" />
+<x-jalali-datepicker wire:model="event_date" :disabled="true" />
 ```
 
 ### Default value
@@ -210,7 +217,7 @@ Show calendar always open (no dropdown):
 Set initial value (same format as export):
 
 ```blade
-<x-datepicker wire:model="event_date" default="1403/06/15" />
+<x-jalali-datepicker wire:model="event_date" default="1403/06/15" />
 ```
 
 ---
@@ -287,7 +294,7 @@ $g = jalali_to_gregorian(1403, 1, 1);
 
 - **Package:** `karnoweb/livewire-datepicker`
 - **PHP namespace:** `Karnoweb\LivewireDatepicker`
-- **Blade component:** `<x-datepicker />` (no prefix)
+- **Blade component:** `<x-jalali-datepicker />` (prefix `jalali` to avoid Mary-UI collision)
 
 ---
 

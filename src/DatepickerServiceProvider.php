@@ -29,7 +29,8 @@ class DatepickerServiceProvider extends ServiceProvider
 
         $this->loadViewsFrom(__DIR__ . '/../resources/views', 'datepicker');
 
-        $this->loadViewComponentsAs('', [
+        // Use prefix "jalali" to avoid collision with Mary-UI's <x-datepicker> → <x-jalali-datepicker>
+        $this->loadViewComponentsAs('jalali', [
             View\Components\Datepicker::class,
         ]);
     }

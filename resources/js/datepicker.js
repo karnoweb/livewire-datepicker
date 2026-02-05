@@ -458,9 +458,10 @@ document.addEventListener('alpine:init', () => {
             if (this.config.range && this.rangeStart && !this.rangeEnd) this.hoverDate = date;
         },
 
+        // auto = follow app theme (.dark on html/body); no class so CSS .dark .dp-wrapper applies
         get themeClass() {
-            if (this.config.theme === 'auto') return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dp-dark' : 'dp-light';
-            return this.config.theme === 'dark' ? 'dp-dark' : 'dp-light';
+            if (this.config.theme === 'auto') return '';
+            return this.config.theme === 'dark' ? 'dp-dark' : '';
         },
     }));
 });
