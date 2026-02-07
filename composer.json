@@ -1,6 +1,7 @@
 {
     "name": "karnoweb/livewire-datepicker",
     "description": "Jalali/Gregorian datepicker for Livewire 3 with Alpine.js",
+    "version": "1.0.0",
     "keywords": ["laravel", "livewire", "datepicker", "jalali", "persian", "alpine"],
     "license": "MIT",
     "require": {
