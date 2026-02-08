@@ -298,6 +298,29 @@ $g = jalali_to_gregorian(1403, 1, 1);
 
 ---
 
+## Releasing a new version
+
+So clients can get the latest changes via Composer, each release must be tagged. Steps:
+
+1. **Bump version** in `composer.json` (e.g. `1.0.2` → `1.0.3`).
+2. **Commit** your changes:
+   ```bash
+   git add .
+   git commit -m "v1.0.3: your message"
+   ```
+3. **Create tag** (match the version in composer.json):
+   ```bash
+   git tag v1.0.3
+   ```
+4. **Push** branch and tags:
+   ```bash
+   git push && git push --tags
+   ```
+
+Clients using `"karnoweb/livewire-datepicker": "^1.0"` can then run `composer update karnoweb/livewire-datepicker` to get the new release.
+
+---
+
 ## License
 
 MIT.
