@@ -31,7 +31,7 @@
         <input type="hidden" name="{{ $fieldName }}" x-ref="hiddenInput">
 
         <div x-ref="trigger"
-            class="dp-trigger input input-bordered input-sm w-full flex items-center gap-0 pe-0 ps-0 {{ $errors->has($fieldName) ? 'input-error' : '' }}">
+            class="dp-trigger input input-bordered input-md w-full flex items-center gap-0 pe-0 ps-0 {{ $errors->has($fieldName) ? 'input-error' : '' }}">
             <button type="button" x-show="inputValue" x-on:click.stop="clear()"
                 class="dp-clear order-first shrink-0 p-2 text-base-content/60 hover:text-error border-0 bg-transparent cursor-pointer text-sm"
                 aria-label="{{ $jalali ? 'پاک کردن' : 'Clear' }}">
@@ -44,7 +44,7 @@
                 x-on:input.debounce.500ms="handleInput($event)" placeholder="{{ $placeholder }}"
                 @if ($disabled) disabled @endif @if ($required) required @endif
                 autocomplete="off"
-                class="dp-input flex-1 min-w-0 border-0 bg-transparent outline-none focus:ring-0 px-2 py-1.5 text-sm order-2"
+                class="dp-input flex-1 min-w-0 border-0 bg-transparent outline-none focus:ring-0 px-2 py-2 text-base order-2"
                 :class="{ 'opacity-50 cursor-not-allowed': {{ $disabled ? 'true' : 'false' }} }" aria-haspopup="dialog"
                 :aria-expanded="isOpen">
             <button type="button" x-on:click="toggle()"
