@@ -17,10 +17,10 @@
 @endphp
 
 <div class="">
-    <fieldset class="py-0 {{ $label ? 'fieldset w-full' : '' }}">
+    <fieldset class="py-0 {{ $label ? 'fieldset' : '' }}">
         @if ($label ?? null)
-            <legend class="fieldset-legend flex items-center gap-1">
-                <span class="text-base-content font-medium">{{ $label }}</span>
+            <legend class="fieldset-legend mb-0.5">
+                {{ $label }}
                 @if ($required)
                     <span class="text-error">*</span>
                 @endif
