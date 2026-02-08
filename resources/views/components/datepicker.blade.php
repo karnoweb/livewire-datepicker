@@ -16,143 +16,146 @@
     $fieldName = $attributes->get('name', $id);
 @endphp
 
-<fieldset class="{{ $label ? 'fieldset w-full' : '' }}">
-    @if ($label ?? null)
-        <legend class="fieldset-legend flex items-center gap-1">
-            <span class="text-base-content font-medium">{{ $label }}</span>
-            @if ($required)
-                <span class="text-error">*</span>
-            @endif
-        </legend>
-    @endif
-    <div x-data="datepicker(@js($config))" x-on:click.outside="close()" x-on:keydown.escape.window="close()"
-        {{ $attributes->merge(['class' => 'dp-wrapper relative']) }} :class="themeClass" role="application"
-        aria-label="{{ $jalali ? 'انتخاب تاریخ' : 'Date picker' }}">
-        <input type="hidden" name="{{ $fieldName }}" x-ref="hiddenInput">
-
-        <div x-ref="trigger"
-            class="dp-trigger input input-bordered input-md w-full flex items-center gap-0 pe-0 ps-0 {{ $errors->has($fieldName) ? 'input-error' : '' }}">
-            <button type="button" x-show="inputValue" x-on:click.stop="clear()"
-                class="dp-clear order-first shrink-0 p-2 text-base-content/60 hover:text-error border-0 bg-transparent cursor-pointer text-sm"
-                aria-label="{{ $jalali ? 'پاک کردن' : 'Clear' }}">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                    stroke="currentColor" class="w-4 h-4">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-            </button>
-            <input type="text" x-model="inputValue" x-on:focus="open()"
-                x-on:input.debounce.500ms="handleInput($event)" placeholder="{{ $placeholder }}"
-                @if ($disabled) disabled @endif @if ($required) required @endif
-                autocomplete="off"
-                class="dp-input flex-1 min-w-0 border-0 bg-transparent outline-none focus:ring-0 px-2 py-2 text-base order-2"
-                :class="{ 'opacity-50 cursor-not-allowed': {{ $disabled ? 'true' : 'false' }} }" aria-haspopup="dialog"
-                :aria-expanded="isOpen">
-            <button type="button" x-on:click="toggle()"
-                class="dp-icon order-last shrink-0 p-2 text-base-content/60 hover:text-base-content border-0 bg-transparent cursor-pointer text-sm"
-                tabindex="-1" aria-label="{{ $jalali ? 'باز کردن تقویم' : 'Open calendar' }}">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                    stroke="currentColor" class="w-4 h-4">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
-                </svg>
-            </button>
-        </div>
-
-        <div x-ref="dropdown" x-show="isOpen" x-transition:enter="transition ease-out duration-200"
-            x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
-            x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 scale-100"
-            x-transition:leave-end="opacity-0 scale-95" class="dp-dropdown" role="dialog" aria-modal="true"
-            aria-label="{{ $jalali ? 'تقویم' : 'Calendar' }}" x-cloak>
-            <div class="dp-header">
-                <button type="button"
-                    x-on:click="view === 'years' ? prevYearRange() : (view === 'months' ? prevYear() : prevMonth())"
-                    class="dp-nav-btn" aria-label="{{ $jalali ? 'قبلی' : 'Previous' }}">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                        stroke="currentColor" class="w-4 h-4">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="{{ $jalali ? 'M8.25 4.5l7.5 7.5-7.5 7.5' : 'M15.75 19.5L8.25 12l7.5-7.5' }}" />
-                    </svg>
-                </button>
-                <div class="dp-header-title">
-                    <button type="button" x-show="view === 'days'" x-on:click="view = 'months'" class="dp-title-btn"
-                        x-text="currentMonthName"></button>
-                    <button type="button" x-on:click="view = view === 'years' ? 'days' : 'years'" class="dp-title-btn"
-                        x-text="view === 'years' ? `${yearRangeStart} - ${yearRangeStart + 11}` : currentYear"></button>
-                </div>
-                <button type="button"
-                    x-on:click="view === 'years' ? nextYearRange() : (view === 'months' ? nextYear() : nextMonth())"
-                    class="dp-nav-btn" aria-label="{{ $jalali ? 'بعدی' : 'Next' }}">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                        stroke="currentColor" class="w-4 h-4">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="{{ $jalali ? 'M15.75 19.5L8.25 12l7.5-7.5' : 'M8.25 4.5l7.5 7.5-7.5 7.5' }}" />
-                    </svg>
-                </button>
-            </div>
-
-            <div x-show="view === 'days'" class="dp-body">
-                <div class="dp-weekdays">
-                    <template x-for="day in weekDays" :key="day">
-                        <div class="dp-weekday" x-text="day"></div>
-                    </template>
-                </div>
-                <div class="dp-days">
-                    <template x-for="(week, weekIndex) in weeks" :key="weekIndex">
-                        <div class="dp-week">
-                            <template x-for="(day, dayIndex) in week" :key="`${weekIndex}-${dayIndex}`">
-                                <button type="button" x-on:click="selectDate(day.date)"
-                                    x-on:mouseenter="handleDayHover(day.date)"
-                                    :disabled="day.isDisabled || !day.isCurrentMonth" class="dp-day"
-                                    :class="{
-                                        'dp-day-other': !day.isCurrentMonth,
-                                        'dp-day-today': day.isToday,
-                                        'dp-day-selected': day.isSelected,
-                                        'dp-day-disabled': day.isDisabled,
-                                        'dp-day-in-range': day.isInRange,
-                                        'dp-day-range-start': day.isRangeStart,
-                                        'dp-day-range-end': day.isRangeEnd,
-                                        'dp-day-focused': day.isFocused,
-                                    }"
-                                    x-text="day.date.day" :aria-selected="day.isSelected"
-                                    :aria-current="day.isToday ? 'date' : false"></button>
-                            </template>
-                        </div>
-                    </template>
-                </div>
-            </div>
-
-            <div x-show="view === 'months'" class="dp-months">
-                <template x-for="month in months" :key="month.num">
-                    <button type="button" x-on:click="selectMonth(month.num)" :disabled="month.isDisabled"
-                        class="dp-month"
-                        :class="{ 'dp-month-selected': month.isSelected, 'dp-month-disabled': month.isDisabled }"
-                        x-text="month.name"></button>
-                </template>
-            </div>
-
-            <div x-show="view === 'years'" class="dp-years">
-                <template x-for="yearItem in years" :key="yearItem.year">
-                    <button type="button" x-on:click="selectYear(yearItem.year)" :disabled="yearItem.isDisabled"
-                        class="dp-year"
-                        :class="{ 'dp-year-selected': yearItem.isSelected, 'dp-year-disabled': yearItem.isDisabled }"
-                        x-text="yearItem.year"></button>
-                </template>
-            </div>
-
-            <div class="dp-footer">
-                <button type="button" x-on:click="goToToday()"
-                    class="dp-today-btn">{{ $jalali ? 'امروز' : 'Today' }}</button>
-                @if ($range || $multiple)
-                    <button type="button" x-on:click="clear()"
-                        class="dp-clear-btn">{{ $jalali ? 'پاک کردن' : 'Clear' }}</button>
+<div class="">
+    <fieldset class="py-0 {{ $label ? 'fieldset w-full' : '' }}">
+        @if ($label ?? null)
+            <legend class="fieldset-legend flex items-center gap-1">
+                <span class="text-base-content font-medium">{{ $label }}</span>
+                @if ($required)
+                    <span class="text-error">*</span>
                 @endif
+            </legend>
+        @endif
+        <div x-data="datepicker(@js($config))" x-on:click.outside="close()" x-on:keydown.escape.window="close()"
+            {{ $attributes->merge(['class' => 'dp-wrapper relative']) }} :class="themeClass" role="application"
+            aria-label="{{ $jalali ? 'انتخاب تاریخ' : 'Date picker' }}">
+            <input type="hidden" name="{{ $fieldName }}" x-ref="hiddenInput">
+
+            <div x-ref="trigger"
+                class="dp-trigger input input-bordered input-md w-full flex items-center gap-0 pe-0 ps-0 {{ $errors->has($fieldName) ? 'input-error' : '' }}">
+                <button type="button" x-show="inputValue" x-on:click.stop="clear()"
+                    class="dp-clear order-first shrink-0 p-2 text-base-content/60 hover:text-error border-0 bg-transparent cursor-pointer text-sm"
+                    aria-label="{{ $jalali ? 'پاک کردن' : 'Clear' }}">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor" class="w-4 h-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+                <input type="text" x-model="inputValue" x-on:focus="open()"
+                    x-on:input.debounce.500ms="handleInput($event)" placeholder="{{ $placeholder }}"
+                    @if ($disabled) disabled @endif @if ($required) required @endif
+                    autocomplete="off"
+                    class="dp-input flex-1 min-w-0 border-0 bg-transparent outline-none focus:ring-0 px-2 py-2 text-base order-2"
+                    :class="{ 'opacity-50 cursor-not-allowed': {{ $disabled ? 'true' : 'false' }} }"
+                    aria-haspopup="dialog" :aria-expanded="isOpen">
+                <button type="button" x-on:click="toggle()"
+                    class="dp-icon order-last shrink-0 p-2 text-base-content/60 hover:text-base-content border-0 bg-transparent cursor-pointer text-sm"
+                    tabindex="-1" aria-label="{{ $jalali ? 'باز کردن تقویم' : 'Open calendar' }}">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor" class="w-4 h-4">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+                    </svg>
+                </button>
+            </div>
+
+            <div x-ref="dropdown" x-show="isOpen" x-transition:enter="transition ease-out duration-200"
+                x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
+                x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 scale-100"
+                x-transition:leave-end="opacity-0 scale-95" class="dp-dropdown" role="dialog" aria-modal="true"
+                aria-label="{{ $jalali ? 'تقویم' : 'Calendar' }}" x-cloak>
+                <div class="dp-header">
+                    <button type="button"
+                        x-on:click="view === 'years' ? prevYearRange() : (view === 'months' ? prevYear() : prevMonth())"
+                        class="dp-nav-btn" aria-label="{{ $jalali ? 'قبلی' : 'Previous' }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                            stroke="currentColor" class="w-4 h-4">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="{{ $jalali ? 'M8.25 4.5l7.5 7.5-7.5 7.5' : 'M15.75 19.5L8.25 12l7.5-7.5' }}" />
+                        </svg>
+                    </button>
+                    <div class="dp-header-title">
+                        <button type="button" x-show="view === 'days'" x-on:click="view = 'months'"
+                            class="dp-title-btn" x-text="currentMonthName"></button>
+                        <button type="button" x-on:click="view = view === 'years' ? 'days' : 'years'"
+                            class="dp-title-btn"
+                            x-text="view === 'years' ? `${yearRangeStart} - ${yearRangeStart + 11}` : currentYear"></button>
+                    </div>
+                    <button type="button"
+                        x-on:click="view === 'years' ? nextYearRange() : (view === 'months' ? nextYear() : nextMonth())"
+                        class="dp-nav-btn" aria-label="{{ $jalali ? 'بعدی' : 'Next' }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                            stroke="currentColor" class="w-4 h-4">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="{{ $jalali ? 'M15.75 19.5L8.25 12l7.5-7.5' : 'M8.25 4.5l7.5 7.5-7.5 7.5' }}" />
+                        </svg>
+                    </button>
+                </div>
+
+                <div x-show="view === 'days'" class="dp-body">
+                    <div class="dp-weekdays">
+                        <template x-for="day in weekDays" :key="day">
+                            <div class="dp-weekday" x-text="day"></div>
+                        </template>
+                    </div>
+                    <div class="dp-days">
+                        <template x-for="(week, weekIndex) in weeks" :key="weekIndex">
+                            <div class="dp-week">
+                                <template x-for="(day, dayIndex) in week" :key="`${weekIndex}-${dayIndex}`">
+                                    <button type="button" x-on:click="selectDate(day.date)"
+                                        x-on:mouseenter="handleDayHover(day.date)"
+                                        :disabled="day.isDisabled || !day.isCurrentMonth" class="dp-day"
+                                        :class="{
+                                            'dp-day-other': !day.isCurrentMonth,
+                                            'dp-day-today': day.isToday,
+                                            'dp-day-selected': day.isSelected,
+                                            'dp-day-disabled': day.isDisabled,
+                                            'dp-day-in-range': day.isInRange,
+                                            'dp-day-range-start': day.isRangeStart,
+                                            'dp-day-range-end': day.isRangeEnd,
+                                            'dp-day-focused': day.isFocused,
+                                        }"
+                                        x-text="day.date.day" :aria-selected="day.isSelected"
+                                        :aria-current="day.isToday ? 'date' : false"></button>
+                                </template>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+                <div x-show="view === 'months'" class="dp-months">
+                    <template x-for="month in months" :key="month.num">
+                        <button type="button" x-on:click="selectMonth(month.num)" :disabled="month.isDisabled"
+                            class="dp-month"
+                            :class="{ 'dp-month-selected': month.isSelected, 'dp-month-disabled': month.isDisabled }"
+                            x-text="month.name"></button>
+                    </template>
+                </div>
+
+                <div x-show="view === 'years'" class="dp-years">
+                    <template x-for="yearItem in years" :key="yearItem.year">
+                        <button type="button" x-on:click="selectYear(yearItem.year)" :disabled="yearItem.isDisabled"
+                            class="dp-year"
+                            :class="{ 'dp-year-selected': yearItem.isSelected, 'dp-year-disabled': yearItem.isDisabled }"
+                            x-text="yearItem.year"></button>
+                    </template>
+                </div>
+
+                <div class="dp-footer">
+                    <button type="button" x-on:click="goToToday()"
+                        class="dp-today-btn">{{ $jalali ? 'امروز' : 'Today' }}</button>
+                    @if ($range || $multiple)
+                        <button type="button" x-on:click="clear()"
+                            class="dp-clear-btn">{{ $jalali ? 'پاک کردن' : 'Clear' }}</button>
+                    @endif
+                </div>
             </div>
         </div>
-    </div>
-    @error($fieldName)
-        <p class="label text-error mt-1" role="alert">{{ $message }}</p>
-    @enderror
-</fieldset>
+        @error($fieldName)
+            <p class="label text-error mt-1" role="alert">{{ $message }}</p>
+        @enderror
+    </fieldset>
+</div>
 
 @once
     @push('style')
