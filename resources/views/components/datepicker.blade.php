@@ -12,23 +12,28 @@
     'label',
 ])
 
-<div class="{{ $label ? 'form-control w-full' : '' }}">
+@php
+    $fieldName = $attributes->get('name', $id);
+@endphp
+
+<fieldset class="{{ $label ? 'fieldset w-full' : '' }}">
     @if ($label ?? null)
-        <label class="label mb-0.5" for="{{ $id }}">
-            <span class="label-text">{{ $label }}</span>
+        <legend class="fieldset-legend flex items-center gap-1">
+            <span class="text-base-content font-medium">{{ $label }}</span>
             @if ($required)
-                <span class="label-text-alt text-error">*</span>
+                <span class="text-error">*</span>
             @endif
-        </label>
+        </legend>
     @endif
     <div x-data="datepicker(@js($config))" x-on:click.outside="close()" x-on:keydown.escape.window="close()"
         {{ $attributes->merge(['class' => 'dp-wrapper relative']) }} :class="themeClass" role="application"
         aria-label="{{ $jalali ? 'انتخاب تاریخ' : 'Date picker' }}">
-        <input type="hidden" name="{{ $attributes->get('name', $id) }}" x-ref="hiddenInput">
+        <input type="hidden" name="{{ $fieldName }}" x-ref="hiddenInput">
 
-        <div x-ref="trigger" class="dp-trigger input input-bordered w-full flex items-center gap-0 min-h-12 pe-0 ps-0">
+        <div x-ref="trigger"
+            class="dp-trigger input input-bordered input-sm w-full flex items-center gap-0 pe-0 ps-0 {{ $errors->has($fieldName) ? 'input-error' : '' }}">
             <button type="button" x-show="inputValue" x-on:click.stop="clear()"
-                class="dp-clear order-first shrink-0 p-2.5 text-base-content/60 hover:text-error border-0 bg-transparent cursor-pointer"
+                class="dp-clear order-first shrink-0 p-2 text-base-content/60 hover:text-error border-0 bg-transparent cursor-pointer text-sm"
                 aria-label="{{ $jalali ? 'پاک کردن' : 'Clear' }}">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                     stroke="currentColor" class="w-4 h-4">
@@ -39,14 +44,14 @@
                 x-on:input.debounce.500ms="handleInput($event)" placeholder="{{ $placeholder }}"
                 @if ($disabled) disabled @endif @if ($required) required @endif
                 autocomplete="off"
-                class="dp-input flex-1 min-w-0 border-0 bg-transparent outline-none focus:ring-0 px-3 py-2 order-2"
+                class="dp-input flex-1 min-w-0 border-0 bg-transparent outline-none focus:ring-0 px-2 py-1.5 text-sm order-2"
                 :class="{ 'opacity-50 cursor-not-allowed': {{ $disabled ? 'true' : 'false' }} }" aria-haspopup="dialog"
                 :aria-expanded="isOpen">
             <button type="button" x-on:click="toggle()"
-                class="dp-icon order-last shrink-0 p-2.5 text-base-content/60 hover:text-base-content border-0 bg-transparent cursor-pointer"
+                class="dp-icon order-last shrink-0 p-2 text-base-content/60 hover:text-base-content border-0 bg-transparent cursor-pointer text-sm"
                 tabindex="-1" aria-label="{{ $jalali ? 'باز کردن تقویم' : 'Open calendar' }}">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                    stroke="currentColor" class="w-5 h-5">
+                    stroke="currentColor" class="w-4 h-4">
                     <path stroke-linecap="round" stroke-linejoin="round"
                         d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
                 </svg>
@@ -144,9 +149,10 @@
             </div>
         </div>
     </div>
-    @if ($label ?? null)
-</div>
-@endif
+    @error($fieldName)
+        <p class="label text-error mt-1" role="alert">{{ $message }}</p>
+    @enderror
+</fieldset>
 
 @once
     @push('style')
