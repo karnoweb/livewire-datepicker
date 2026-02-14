@@ -459,3 +459,7 @@
         </style>
     @endpush
 @endonce
+
+@once
+    <script src="{{ route('livewire-datepicker.script') }}" defer></script>
+@endonce

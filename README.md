@@ -24,13 +24,15 @@ Datepicker component for **Livewire 3** with **Alpine.js**, supporting **Jalali 
 
 - PHP ^8.2
 - Laravel ^11.0 | ^12.0
-- Livewire ^3.0
-- Alpine.js (included with Livewire 3)
+- Livewire ^3.0 | ^4.0
+- Alpine.js (included with Livewire)
+
+No extra npm packages or Vite setup are required in your app — the component loads its script automatically (jalaali-js is bundled inside the package).
 
 ## Calendar conversion (tested packages)
 
 - **PHP:** [morilog/jalali](https://github.com/morilog/jalali) (^3.4) — Jalali/Gregorian conversion; used by the package helpers `jalali_to_gregorian()` and `gregorian_to_jalali()`.
-- **JavaScript:** [jalaali-js](https://github.com/jalaali/jalaali-js) — Borkowski algorithm; the package’s Alpine datepicker uses it via a thin wrapper. Your app must have `jalaali-js` in `package.json` and import the package’s `jalali.js` + `datepicker.js` in its Vite entry so the wrapper and datepicker are bundled.
+- **JavaScript:** [jalaali-js](https://github.com/jalaali/jalaali-js) — Borkowski algorithm; bundled inside the package and served automatically.
 
 ---
 
@@ -48,41 +50,7 @@ php artisan vendor:publish --tag=datepicker-config
 
 Edit `config/datepicker.php` to set default formats, theme, first day of week, and locale strings.
 
-### Include Alpine component (required)
-
-The package registers a Blade component but the datepicker logic lives in Alpine. You must load the JS once in your layout (e.g. before `</body>` or in your main JS bundle).
-
-**Option A — Vite / build step**
-
-In `resources/js/app.js` (or your entry):
-
-```js
-import './../../vendor/karnoweb/livewire-datepicker/resources/js/datepicker.js';
-```
-
-Then ensure this built `app.js` is included in your layout (e.g. `@vite(['resources/js/app.js'])`).
-
-**Option B — Publish assets and include script tag**
-
-```bash
-php artisan vendor:publish --tag=datepicker-assets
-```
-
-Then in your Blade layout:
-
-```html
-<script defer src="{{ asset('vendor/datepicker/datepicker.js') }}"></script>
-```
-
-Note: `datepicker.js` imports `jalali.js`; if you use a bundler, the import above is enough. If you load via `<script src="...">`, you may need to concatenate or load `jalali.js` before `datepicker.js`.
-
-**Option C — Monorepo / local path**
-
-If the package is in `packages/karnoweb/livewire-datepicker`, point your bundler to:
-
-```
-packages/karnoweb/livewire-datepicker/resources/js/datepicker.js
-```
+The datepicker script (including jalaali-js) is loaded automatically when you use `<x-jalali-datepicker>`. No npm install or Vite entry in your app is required.
 
 ---
 
@@ -286,7 +254,7 @@ $g = jalali_to_gregorian(1403, 1, 1);
 
 - **Config:** `php artisan vendor:publish --tag=datepicker-config`
 - **Views:** `php artisan vendor:publish --tag=datepicker-views` → customize Blade under `resources/views/vendor/datepicker`
-- **Assets:** `php artisan vendor:publish --tag=datepicker-assets` → copies JS to `public/vendor/datepicker`
+- **Assets (optional):** `php artisan vendor:publish --tag=datepicker-assets` → copies raw JS sources to `public/vendor/datepicker` (only if you want to build them in your app; normally the bundled script is served by the package)
 
 ---
 
@@ -303,7 +271,8 @@ $g = jalali_to_gregorian(1403, 1, 1);
 So clients can get the latest changes via Composer, each release must be tagged. Steps:
 
 1. **Bump version** in `composer.json` (e.g. `1.0.2` → `1.0.3`).
-2. **Commit** your changes:
+2. **Rebuild the JS bundle** (if you changed `resources/js/`): run `npm install && npm run build` and commit `dist/datepicker.js`.
+3. **Commit** your changes:
    ```bash
    git add .
    git commit -m "v1.0.3: your message"

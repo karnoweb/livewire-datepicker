@@ -5,6 +5,8 @@ declare(strict_types=1);
 return [
     'default_calendar' => 'jalali',
 
+    'script_url' => '/vendor/livewire-datepicker/datepicker.js',
+
     'formats' => [
         'input' => 'Y/m/d',
         'export' => 'Y-m-d',

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Karnoweb\LivewireDatepicker;
 
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
 class DatepickerServiceProvider extends ServiceProvider
@@ -15,6 +16,8 @@ class DatepickerServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        $this->registerScriptRoute();
+
         $this->publishes([
             __DIR__ . '/../config/datepicker.php' => config_path('datepicker.php'),
         ], 'datepicker-config');
@@ -33,5 +36,17 @@ class DatepickerServiceProvider extends ServiceProvider
         $this->loadViewComponentsAs('jalali', [
             View\Components\Datepicker::class,
         ]);
+    }
+
+    protected function registerScriptRoute(): void
+    {
+        Route::get(config('datepicker.script_url', '/vendor/livewire-datepicker/datepicker.js'), function () {
+            $path = __DIR__ . '/../dist/datepicker.js';
+            if (! is_file($path)) {
+                abort(404, 'Livewire Datepicker script not built. Run npm install && npm run build in the package directory.');
+            }
+
+            return response()->file($path, ['Content-Type' => 'application/javascript']);
+        })->name('livewire-datepicker.script');
     }
 }

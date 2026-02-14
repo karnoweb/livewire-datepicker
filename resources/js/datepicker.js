@@ -4,8 +4,8 @@
 
 import Jalali from './jalali.js';
 
-document.addEventListener('alpine:init', () => {
-    Alpine.data('datepicker', (config) => ({
+function registerDatepicker() {
+    window.Alpine.data('datepicker', (config) => ({
         isOpen: false,
         view: 'days',
         currentYear: null,
@@ -464,4 +464,9 @@ document.addEventListener('alpine:init', () => {
             return this.config.theme === 'dark' ? 'dp-dark' : '';
         },
     }));
-});
+}
+
+document.addEventListener('alpine:init', registerDatepicker);
+if (typeof window.Alpine !== 'undefined' && window.Alpine.version) {
+    registerDatepicker();
+}

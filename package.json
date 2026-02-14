@@ -1,0 +1,14 @@
+{
+    "name": "karnoweb/livewire-datepicker",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "build": "vite build"
+    },
+    "dependencies": {
+        "jalaali-js": "^1.2.2"
+    },
+    "devDependencies": {
+        "vite": "^6.0.0"
+    }
+}
