@@ -39,7 +39,11 @@ No extra npm packages or Vite setup are required in your app — the component l
 ## Installation
 
 ```bash
-composer require karnoweb/livewire-datepicker
+# Laravel 13
+composer require karnoweb/livewire-datepicker:^13.0
+
+# Laravel 11–12
+composer require karnoweb/livewire-datepicker:^1.0
 ```
 
 ### Publish config (optional)
